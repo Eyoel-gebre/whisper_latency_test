@@ -3,9 +3,11 @@ import time
 from vllm import LLM, SamplingParams
 from vllm.assets.audio import AudioAsset
 
+model = input('model? (tiny, small, medium, ...) > ')
+
 # Create a Whisper encoder/decoder model instance
 llm = LLM(
-    model="openai/whisper-large-v3",
+    model=f"openai/whisper-{model}",
     max_model_len=448,
     max_num_seqs=400,
     limit_mm_per_prompt={"audio": 1},
@@ -28,7 +30,7 @@ prompts = [
         },
         "decoder_prompt": "<|startoftranscript|>",
     }
-] * 1024
+] 
 
 # Create a sampling params object.
 sampling_params = SamplingParams(
@@ -49,9 +51,9 @@ for output in outputs:
     prompt = output.prompt
     encoder_prompt = output.encoder_prompt
     generated_text = output.outputs[0].text
-    print(f"Encoder prompt: {encoder_prompt!r}, "
-          f"Decoder prompt: {prompt!r}, "
-          f"Generated text: {generated_text!r}")
+    print(f"\nEncoder prompt: {encoder_prompt!r}, "
+          f"\nDecoder prompt: {prompt!r}, "
+          f"\nGenerated text: {generated_text!r}")
 
 duration = time.time() - start
 

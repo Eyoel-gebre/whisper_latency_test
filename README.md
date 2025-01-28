@@ -6,8 +6,13 @@ conda create --name "whisper_latency" python=3.10
 
 2.
 
-pip install -r requirements.txt
+conda activate whisper_latency
+
 
 3.
 
-python latency.py
+pip install -r requirements.txt
+
+4.
+
+run one of the latency measuring scripts with "python ..."
