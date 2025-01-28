@@ -1,3 +1,5 @@
+Repo for testing/profiling encoder-decoder model (openai-whisper) serving performance.
+
 1.
 
 conda create --name "whisper_latency" python=3.10
