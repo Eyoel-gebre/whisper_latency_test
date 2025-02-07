@@ -5,22 +5,9 @@ from vllm import LLM, SamplingParams
 from vllm.assets.audio import AudioAsset
 import matplotlib.pyplot as plt
 
-def run_benchmark(num_prompts, num_iterations=3):
+def run_benchmark(llm, num_prompts, num_iterations=3):
     """Run benchmark with given number of prompts and return average latency and throughput."""
-    print(f"\nInitializing LLM for {num_prompts} prompts...")
-    try:
-        llm = LLM(
-            model=f"openai/whisper-{model}",
-            trust_remote_code=True,
-            tensor_parallel_size=1,
-            gpu_memory_utilization=0.9,
-            # Note: we're not setting max_model_len or max_num_seqs as they weren't in the constructor args
-        )
-    except Exception as e:
-        print(f"Error initializing LLM: {e}")
-        raise
-
-    print("Creating prompts...")
+    print(f"\nCreating {num_prompts} prompts...")
     try:
         # Create prompts for the batch
         base_prompt = {
@@ -57,7 +44,7 @@ def run_benchmark(num_prompts, num_iterations=3):
 
     avg_latency = np.mean(latencies)
     throughput = num_prompts / avg_latency  # sequences per second
-    
+
     return avg_latency, throughput
 
 def create_throughput_latency_plot(results):
@@ -65,25 +52,25 @@ def create_throughput_latency_plot(results):
     if not results:
         print("No results to plot!")
         return
-    
+
     num_prompts, latencies, throughputs = zip(*results)
-    
-    # Create figure with two subplots sharing x-axis
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12), sharex=True)
-    
-    # Plot latency vs number of prompts
-    ax1.plot(num_prompts, latencies, 'b-o')
-    ax1.set_ylabel('Latency (seconds)')
-    ax1.set_title('Latency vs Number of Prompts')
-    ax1.grid(True)
-    
-    # Plot throughput vs number of prompts
-    ax2.plot(num_prompts, throughputs, 'r-o')
-    ax2.set_xlabel('Number of Prompts')
-    ax2.set_ylabel('Throughput (sequences/second)')
-    ax2.set_title('Throughput vs Number of Prompts')
-    ax2.grid(True)
-    
+
+    # Create figure
+    plt.figure(figsize=(10, 6))
+
+    # Scatter plot for throughput vs latency
+    plt.scatter(latencies, throughputs)
+
+    # Label each point with the number of prompts
+    for i, num_prompt in enumerate(num_prompts):
+        plt.text(latencies[i], throughputs[i], str(num_prompt), ha='right', va='bottom')
+
+    # Set axis labels and title
+    plt.xlabel('Latency (seconds)')
+    plt.ylabel('Throughput (sequences/second)')
+    plt.title('Throughput vs Latency')
+    plt.grid(True)
+
     plt.tight_layout()
     plt.savefig('whisper_benchmark_results.png')
     plt.close()
@@ -91,31 +78,44 @@ def create_throughput_latency_plot(results):
 if __name__ == "__main__":
     # Get model size from user
     model = input('model? (tiny, small, medium, ...) > ')
-    
+
+    # Initialize LLM once
+    print("\nInitializing LLM...")
+    try:
+        llm = LLM(
+            model=f"openai/whisper-{model}",
+            trust_remote_code=True,
+            tensor_parallel_size=1,
+            gpu_memory_utilization=0.9,
+        )
+    except Exception as e:
+        print(f"Error initializing LLM: {e}")
+        exit(1)
+
     # Define numbers of prompts to test (starting small)
     num_prompts_list = [1, 2, 4, 8, 16, 32]  # Start with smaller numbers
     results = []
-    
+
     print("\nRunning benchmarks...")
     for num_prompts in num_prompts_list:
         print(f"\n{'='*50}")
         print(f"Testing with {num_prompts} prompts")
         print(f"{'='*50}")
         try:
-            latency, throughput = run_benchmark(num_prompts)
+            latency, throughput = run_benchmark(llm, num_prompts)
             results.append((num_prompts, latency, throughput))
             print(f"Success - Latency: {latency:.2f}s, Throughput: {throughput:.2f} sequences/second")
         except Exception as e:
             print(f"\nFailed with {num_prompts} prompts: {str(e)}")
             print("Stopping benchmark run")
             break
-    
+
     print(f"\nCompleted benchmarks. Total successful runs: {len(results)}")
-    
+
     if results:
         # Create and save the plot
         create_throughput_latency_plot(results)
-        
+
         # Print summary table
         print("\nSummary:")
         print("Num Prompts | Latency (s) | Throughput (seq/s)")
