@@ -93,7 +93,7 @@ if __name__ == "__main__":
         exit(1)
 
     # Define numbers of prompts to test (starting small)
-    num_prompts_list = [1, 2, 4, 8]  # Start with smaller numbers
+    num_prompts_list = [1, 2, 4, 8, 16, 32, 64, 128, 256]  # Start with smaller numbers
     results = []
 
     print("\nRunning benchmarks...")
