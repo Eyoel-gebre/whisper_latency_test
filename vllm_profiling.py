@@ -58,12 +58,12 @@ def create_throughput_latency_plot(results):
     # Create figure
     plt.figure(figsize=(10, 6))
 
-    # Scatter plot for throughput vs latency
-    plt.scatter(latencies, throughputs)
+    # Line plot connecting the dots
+    plt.plot(latencies, throughputs, marker='o', linestyle='-')
 
     # Label each point with the number of prompts
     for i, num_prompt in enumerate(num_prompts):
-        plt.text(latencies[i], throughputs[i], str(num_prompt), ha='right', va='bottom')
+        plt.text(latencies[i], throughputs[i], f"num_prompts={num_prompt}", ha='right', va='bottom')
 
     # Set axis labels and title
     plt.xlabel('Latency (seconds)')
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         exit(1)
 
     # Define numbers of prompts to test (starting small)
-    num_prompts_list = [1, 2, 4, 8, 16, 32]  # Start with smaller numbers
+    num_prompts_list = [1, 2, 4, 8]  # Start with smaller numbers
     results = []
 
     print("\nRunning benchmarks...")
