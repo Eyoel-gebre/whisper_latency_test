@@ -59,7 +59,7 @@ def run_profiling(batch_size, num_samples, dataset):
     total_batches = ceil(len(prompts) / batch_size)
     
     # Run profiling
-    print(f"Starting profiling with {total_batches} batches (batch size: {batch_size})...")
+    #print(f"Starting profiling with {total_batches} batches (batch size: {batch_size})...")
     
     # Start profiling
     llm.start_profile()
