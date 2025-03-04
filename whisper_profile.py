@@ -65,15 +65,16 @@ def run_profiling(batch_size, num_samples, dataset):
     llm.start_profile()
     
     # Process batches
-    for batch_idx in range(total_batches):
-        batch_prompts = prompts[batch_idx * batch_size : (batch_idx + 1) * batch_size]
-        
-        print(f"Processing batch {batch_idx+1}/{total_batches} with {len(batch_prompts)} samples...")
-        batch_start = time.time()
-        outputs = llm.generate(batch_prompts, sampling_params)
-        batch_duration = time.time() - batch_start
-        
-        print(f"Batch {batch_idx+1} completed in {batch_duration:.2f} seconds")
+    #for batch_idx in range(total_batches):
+        #batch_prompts = prompts[batch_idx * batch_size : (batch_idx + 1) * batch_size]
+        #
+        #print(f"Processing batch {batch_idx+1}/{total_batches} with {len(batch_prompts)} samples...")
+        #batch_start = time.time()
+        #outputs = llm.generate(batch_prompts, sampling_params)
+        #batch_duration = time.time() - batch_start
+        #
+        #print(f"Batch {batch_idx+1} completed in {batch_duration:.2f} seconds")
+    llm.generate(prompts, sampling_params)
     
     # Stop profiling
     llm.stop_profile()
